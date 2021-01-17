@@ -1,0 +1,26 @@
+﻿@page "/beatcalculator"
+
+<h3>BeatCalculator</h3>
+
+<div>
+    <label>BPM</label><input type="number" @bind="bpm"/><button class="btn btn-primary" @onclick="Calculate">Calculate</button>
+</div>
+
+<div>
+    @for(int i = 1; i < 100; i++)
+    {
+        <label>Measure @i: </label>@((measure * (double)i).ToString("0.####"))<br />
+    }
+</div>
+
+@code {
+    private int bpm;
+
+    private double measure;
+
+    private void Calculate()
+    {
+        double bps = (double)bpm / 60;
+        measure = (1 / bps) * 4;
+    }
+}

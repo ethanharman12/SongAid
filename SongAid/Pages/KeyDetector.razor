@@ -1,0 +1,297 @@
+﻿@page "/keydetector"
+
+<style>
+    .selected {
+        background-color: powderblue;
+    }
+</style>
+
+<h3>KeyDetector</h3>
+
+@foreach(var group in GroupNotes())
+{
+<div>
+    @foreach(var note in group)
+    {
+        <button @onclick="(e) => Toggle(note)" class="@(SelectedNotes.Contains(note) ? "selected" : "")">@note</button>
+    }
+</div>
+}
+<hr />
+@foreach(var key in SelectedKeys)
+{
+    <div>
+        <label>@key.Name</label><br />
+        @foreach(var note in key.Notes)
+        {
+            @note <br />
+        }
+    </div>
+}
+
+
+@code {
+    private static List<List<Note>> GroupedNotes = GroupNotes();
+    private List<Note> SelectedNotes = new List<Note>();
+    private static List<Key> TotalKeys = CreateKeys();
+    private List<Key> SelectedKeys = new List<Key>();
+
+    private void Toggle(Note note)
+    {
+        if (SelectedNotes.Contains(note))
+        {
+            SelectedNotes.Remove(note);
+        }
+        else
+        {
+            SelectedNotes.Add(note);
+        }
+
+        SelectedKeys = TotalKeys.Where(k => k.Notes.Intersect(SelectedNotes).Count() == SelectedNotes.Count()).ToList();
+    }
+
+    private static List<Key> CreateKeys()
+    {
+        var keys = new List<Key>();
+
+        keys.Add(new Key
+        {
+            Name = "C Major/A Minor",
+            Notes = new List<Note>()
+            {
+                Note.C,
+                Note.D,
+                Note.E,
+                Note.F,
+                Note.G,
+                Note.A,
+                Note.B
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "G Major/E Minor",
+            Notes = new List<Note>()
+            {
+                Note.C,
+                Note.D,
+                Note.E,
+                Note.Fs,
+                Note.Gf,
+                Note.G,
+                Note.A,
+                Note.B
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "D Major/B Minor",
+            Notes = new List<Note>()
+            {
+                Note.Cs,
+                Note.Df,
+                Note.D,
+                Note.E,
+                Note.Fs,
+                Note.Gf,
+                Note.G,
+                Note.A,
+                Note.B
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "A Major/F# Minor",
+            Notes = new List<Note>()
+            {
+                Note.Cs,
+                Note.Df,
+                Note.D,
+                Note.E,
+                Note.Fs,
+                Note.Gf,
+                Note.Gs,
+                Note.Af,
+                Note.A,
+                Note.B
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "E Major/C# Minor",
+            Notes = new List<Note>()
+            {
+                Note.Cs,
+                Note.Df,
+                Note.Ds,
+                Note.Ef,
+                Note.E,
+                Note.Fs,
+                Note.Gf,
+                Note.Gs,
+                Note.Af,
+                Note.A,
+                Note.B
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "B Major/G# Minor",
+            Notes = new List<Note>()
+            {
+                Note.Cs,
+                Note.Df,
+                Note.Ds,
+                Note.Ef,
+                Note.E,
+                Note.Fs,
+                Note.Gf,
+                Note.Gs,
+                Note.Af,
+                Note.As,
+                Note.Bf,
+                Note.B
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "F# Major/D# Minor",
+            Notes = new List<Note>()
+            {
+                Note.Cs,
+                Note.Df,
+                Note.Ds,
+                Note.Ef,
+                Note.F,
+                Note.Fs,
+                Note.Gf,
+                Note.Gs,
+                Note.Af,
+                Note.As,
+                Note.Bf,
+                Note.B
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "C# Major/A# Minor",
+            Notes = new List<Note>()
+            {
+                Note.Cs,
+                Note.Df,
+                Note.Ds,
+                Note.Ef,
+                Note.F,
+                Note.Fs,
+                Note.Gf,
+                Note.Gs,
+                Note.Af,
+                Note.As,
+                Note.Bf,
+                Note.C
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "G# Major/F Minor",
+            Notes = new List<Note>()
+            {
+                Note.Cs,
+                Note.Df,
+                Note.Ds,
+                Note.Ef,
+                Note.F,
+                Note.G,
+                Note.Gs,
+                Note.Af,
+                Note.As,
+                Note.Bf,
+                Note.C
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "D# Major/C Minor",
+            Notes = new List<Note>()
+            {
+                Note.C,
+                Note.D,
+                Note.Ds,
+                Note.Ef,
+                Note.F,
+                Note.G,
+                Note.Gs,
+                Note.Af,
+                Note.As,
+                Note.Bf
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "A# Major/G Minor",
+            Notes = new List<Note>()
+            {
+                Note.C,
+                Note.D,
+                Note.Ds,
+                Note.Ef,
+                Note.F,
+                Note.G,
+                Note.A,
+                Note.As,
+                Note.Bf
+            }
+        });
+
+        keys.Add(new Key
+        {
+            Name = "F Major/D Minor",
+            Notes = new List<Note>()
+            {
+                Note.C,
+                Note.D,
+                Note.E,
+                Note.F,
+                Note.G,
+                Note.A,
+                Note.As,
+                Note.Bf
+            }
+        });
+
+        return keys;
+    }
+
+    private static List<List<Note>> GroupNotes()
+    {
+        var names = Enum.GetNames(typeof(Note));
+
+        var groupedNames = names.GroupBy(n => n[0]);
+
+        List<List<Note>> groupedNotes = new List<List<Note>>();
+
+        foreach(var group in groupedNames)
+        {
+            var groupList = new List<Note>();
+
+            foreach(var note in group)
+            {
+                groupList.Add((Note)Enum.Parse(typeof(Note), note));
+            }
+
+            groupedNotes.Add(groupList);
+        }
+
+        return groupedNotes;
+    }
+}
