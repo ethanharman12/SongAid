@@ -1,5 +1,11 @@
 ﻿@page "/beatcalculator"
 
+<style>
+    label {
+        font-weight: bold;
+    }
+</style>
+
 <h3>BeatCalculator</h3>
 
 <div>
@@ -7,6 +13,10 @@
 </div>
 
 <div>
+    <label>Beat: </label> @((measure / 4).ToString("0.####"))
+</div>
+
+<div>    
     @for(int i = 1; i < 100; i++)
     {
         <label>Measure @i: </label>@((measure * (double)i).ToString("0.####"))<br />

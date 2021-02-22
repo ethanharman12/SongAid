@@ -4,6 +4,13 @@
     .selected {
         background-color: powderblue;
     }
+    label {
+        font-weight: bold;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 2px;
+    }
 </style>
 
 <h3>KeyDetector</h3>
@@ -18,17 +25,64 @@
 </div>
 }
 <hr />
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><label>Major</label></td>
+            <td>M</td>
+            <td>m</td>
+            <td>m</td>
+            <td>M</td>
+            <td>M</td>
+            <td>m</td>
+            <td>dim</td>
+        </tr>
+        <tr>
+            <td><label>Minor</label></td>
+            <td>m</td>
+            <td>dim</td>
+            <td>M</td>
+            <td>m</td>
+            <td>m</td>
+            <td>M</td>
+            <td>M</td>
+        </tr>
+    </tbody>
+</table>
+<hr />
 @foreach(var key in SelectedKeys)
 {
-    <div>
-        <label>@key.Name</label><br />
-        @foreach(var note in key.Notes)
+    int rows = 1;
+<div>
+    <label>@key.Name</label>
+    @for (var i = 0; i < key.Notes.Count; i++)
+    {
+        @if (i > 0 && NotesEqual(key.Notes[i - 1], key.Notes[i]))
         {
-            @note <br />
+            <text>/</text>
         }
-    </div>
+        else
+        {
+            <br />
+            <label>@(rows++):</label>
+        }
+        @key.Notes[i]
+    }
+</div>
+<br />
 }
-
 
 @code {
     private static List<List<Note>> GroupedNotes = GroupNotes();
@@ -74,14 +128,14 @@
             Name = "G Major/E Minor",
             Notes = new List<Note>()
             {
+                Note.G,
+                Note.A,
+                Note.B,
                 Note.C,
                 Note.D,
                 Note.E,
                 Note.Fs,
                 Note.Gf,
-                Note.G,
-                Note.A,
-                Note.B
             }
         });
 
@@ -90,15 +144,15 @@
             Name = "D Major/B Minor",
             Notes = new List<Note>()
             {
-                Note.Cs,
-                Note.Df,
                 Note.D,
                 Note.E,
                 Note.Fs,
                 Note.Gf,
                 Note.G,
                 Note.A,
-                Note.B
+                Note.B,
+                Note.Cs,
+                Note.Df,
             }
         });
 
@@ -107,6 +161,8 @@
             Name = "A Major/F# Minor",
             Notes = new List<Note>()
             {
+                Note.A,
+                Note.B,
                 Note.Cs,
                 Note.Df,
                 Note.D,
@@ -115,8 +171,6 @@
                 Note.Gf,
                 Note.Gs,
                 Note.Af,
-                Note.A,
-                Note.B
             }
         });
 
@@ -125,17 +179,17 @@
             Name = "E Major/C# Minor",
             Notes = new List<Note>()
             {
-                Note.Cs,
-                Note.Df,
-                Note.Ds,
-                Note.Ef,
                 Note.E,
                 Note.Fs,
                 Note.Gf,
                 Note.Gs,
                 Note.Af,
                 Note.A,
-                Note.B
+                Note.B,
+                Note.Cs,
+                Note.Df,
+                Note.Ds,
+                Note.Ef,
             }
         });
 
@@ -144,6 +198,7 @@
             Name = "B Major/G# Minor",
             Notes = new List<Note>()
             {
+                Note.B,
                 Note.Cs,
                 Note.Df,
                 Note.Ds,
@@ -155,7 +210,6 @@
                 Note.Af,
                 Note.As,
                 Note.Bf,
-                Note.B
             }
         });
 
@@ -164,18 +218,18 @@
             Name = "F# Major/D# Minor",
             Notes = new List<Note>()
             {
-                Note.Cs,
-                Note.Df,
-                Note.Ds,
-                Note.Ef,
-                Note.F,
                 Note.Fs,
                 Note.Gf,
                 Note.Gs,
                 Note.Af,
                 Note.As,
                 Note.Bf,
-                Note.B
+                Note.B,
+                Note.Cs,
+                Note.Df,
+                Note.Ds,
+                Note.Ef,
+                Note.F,
             }
         });
 
@@ -204,17 +258,17 @@
             Name = "G# Major/F Minor",
             Notes = new List<Note>()
             {
+                Note.Gs,
+                Note.Af,
+                Note.As,
+                Note.Bf,
+                Note.C,
                 Note.Cs,
                 Note.Df,
                 Note.Ds,
                 Note.Ef,
                 Note.F,
                 Note.G,
-                Note.Gs,
-                Note.Af,
-                Note.As,
-                Note.Bf,
-                Note.C
             }
         });
 
@@ -223,8 +277,6 @@
             Name = "D# Major/C Minor",
             Notes = new List<Note>()
             {
-                Note.C,
-                Note.D,
                 Note.Ds,
                 Note.Ef,
                 Note.F,
@@ -232,7 +284,9 @@
                 Note.Gs,
                 Note.Af,
                 Note.As,
-                Note.Bf
+                Note.Bf,
+                Note.C,
+                Note.D,
             }
         });
 
@@ -241,6 +295,8 @@
             Name = "A# Major/G Minor",
             Notes = new List<Note>()
             {
+                Note.As,
+                Note.Bf,
                 Note.C,
                 Note.D,
                 Note.Ds,
@@ -248,8 +304,6 @@
                 Note.F,
                 Note.G,
                 Note.A,
-                Note.As,
-                Note.Bf
             }
         });
 
@@ -258,14 +312,14 @@
             Name = "F Major/D Minor",
             Notes = new List<Note>()
             {
-                Note.C,
-                Note.D,
-                Note.E,
                 Note.F,
                 Note.G,
                 Note.A,
                 Note.As,
-                Note.Bf
+                Note.Bf,
+                Note.C,
+                Note.D,
+                Note.E
             }
         });
 
@@ -293,5 +347,10 @@
         }
 
         return groupedNotes;
+    }
+
+    private bool NotesEqual(Note note1, Note note2)
+    {
+        return (int)note1 / 10 == (int)note2 / 10;
     }
 }
