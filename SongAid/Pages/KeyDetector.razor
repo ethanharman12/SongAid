@@ -11,6 +11,11 @@
         border: 1px solid black;
         padding: 2px;
     }
+    .buttonCell {
+        width: 40px;
+        display: inline-block;
+        padding: 3px;
+    }
 </style>
 
 <h3>KeyDetector</h3>
@@ -18,76 +23,29 @@
 @foreach(var group in GroupNotes())
 {
 <div>
+    @if(!group.Any(n => n.ToString().Contains("f"))) {
+        <span class="buttonCell"></span>
+    }
     @foreach(var note in group)
     {
-        <button @onclick="(e) => Toggle(note)" class="@(SelectedNotes.Contains(note) ? "selected" : "")">@note</button>
+        <span class="buttonCell"><button @onclick="(e) => Toggle(note)" class="@(SelectedNotes.Contains(note) ? "selected" : "")">@note</button></span>
     }
 </div>
 }
 <hr />
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
-            <th>6</th>
-            <th>7</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><label>Major</label></td>
-            <td>M</td>
-            <td>m</td>
-            <td>m</td>
-            <td>M</td>
-            <td>M</td>
-            <td>m</td>
-            <td>dim</td>
-        </tr>
-        <tr>
-            <td><label>Minor</label></td>
-            <td>m</td>
-            <td>dim</td>
-            <td>M</td>
-            <td>m</td>
-            <td>m</td>
-            <td>M</td>
-            <td>M</td>
-        </tr>
-    </tbody>
-</table>
-<hr />
-@foreach(var key in SelectedKeys)
-{
-    int rows = 1;
-<div>
-    <label>@key.Name</label>
-    @for (var i = 0; i < key.Notes.Count; i++)
-    {
-        @if (i > 0 && NotesEqual(key.Notes[i - 1], key.Notes[i]))
-        {
-            <text>/</text>
-        }
-        else
-        {
-            <br />
-            <label>@(rows++):</label>
-        }
-        @key.Notes[i]
-    }
+<div class="row">
+    <div class="col-md-6">
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == Tone.Major).ToList()"></KeyDisplay>
+    </div>
+    <div class="col-md-6">
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == Tone.Minor).ToList()"></KeyDisplay>
+    </div>
 </div>
-<br />
-}
 
 @code {
     private static List<List<Note>> GroupedNotes = GroupNotes();
     private List<Note> SelectedNotes = new List<Note>();
-    private static List<Key> TotalKeys = CreateKeys();
+    private static List<Key> TotalKeys = KeyCalculator.CalculateKeys();
     private List<Key> SelectedKeys = new List<Key>();
 
     private void Toggle(Note note)
@@ -102,228 +60,6 @@
         }
 
         SelectedKeys = TotalKeys.Where(k => k.Notes.Intersect(SelectedNotes).Count() == SelectedNotes.Count()).ToList();
-    }
-
-    private static List<Key> CreateKeys()
-    {
-        var keys = new List<Key>();
-
-        keys.Add(new Key
-        {
-            Name = "C Major/A Minor",
-            Notes = new List<Note>()
-            {
-                Note.C,
-                Note.D,
-                Note.E,
-                Note.F,
-                Note.G,
-                Note.A,
-                Note.B
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "G Major/E Minor",
-            Notes = new List<Note>()
-            {
-                Note.G,
-                Note.A,
-                Note.B,
-                Note.C,
-                Note.D,
-                Note.E,
-                Note.Fs,
-                Note.Gf,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "D Major/B Minor",
-            Notes = new List<Note>()
-            {
-                Note.D,
-                Note.E,
-                Note.Fs,
-                Note.Gf,
-                Note.G,
-                Note.A,
-                Note.B,
-                Note.Cs,
-                Note.Df,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "A Major/F# Minor",
-            Notes = new List<Note>()
-            {
-                Note.A,
-                Note.B,
-                Note.Cs,
-                Note.Df,
-                Note.D,
-                Note.E,
-                Note.Fs,
-                Note.Gf,
-                Note.Gs,
-                Note.Af,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "E Major/C# Minor",
-            Notes = new List<Note>()
-            {
-                Note.E,
-                Note.Fs,
-                Note.Gf,
-                Note.Gs,
-                Note.Af,
-                Note.A,
-                Note.B,
-                Note.Cs,
-                Note.Df,
-                Note.Ds,
-                Note.Ef,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "B Major/G# Minor",
-            Notes = new List<Note>()
-            {
-                Note.B,
-                Note.Cs,
-                Note.Df,
-                Note.Ds,
-                Note.Ef,
-                Note.E,
-                Note.Fs,
-                Note.Gf,
-                Note.Gs,
-                Note.Af,
-                Note.As,
-                Note.Bf,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "F# Major/D# Minor",
-            Notes = new List<Note>()
-            {
-                Note.Fs,
-                Note.Gf,
-                Note.Gs,
-                Note.Af,
-                Note.As,
-                Note.Bf,
-                Note.B,
-                Note.Cs,
-                Note.Df,
-                Note.Ds,
-                Note.Ef,
-                Note.F,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "C# Major/A# Minor",
-            Notes = new List<Note>()
-            {
-                Note.Cs,
-                Note.Df,
-                Note.Ds,
-                Note.Ef,
-                Note.F,
-                Note.Fs,
-                Note.Gf,
-                Note.Gs,
-                Note.Af,
-                Note.As,
-                Note.Bf,
-                Note.C
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "G# Major/F Minor",
-            Notes = new List<Note>()
-            {
-                Note.Gs,
-                Note.Af,
-                Note.As,
-                Note.Bf,
-                Note.C,
-                Note.Cs,
-                Note.Df,
-                Note.Ds,
-                Note.Ef,
-                Note.F,
-                Note.G,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "D# Major/C Minor",
-            Notes = new List<Note>()
-            {
-                Note.Ds,
-                Note.Ef,
-                Note.F,
-                Note.G,
-                Note.Gs,
-                Note.Af,
-                Note.As,
-                Note.Bf,
-                Note.C,
-                Note.D,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "A# Major/G Minor",
-            Notes = new List<Note>()
-            {
-                Note.As,
-                Note.Bf,
-                Note.C,
-                Note.D,
-                Note.Ds,
-                Note.Ef,
-                Note.F,
-                Note.G,
-                Note.A,
-            }
-        });
-
-        keys.Add(new Key
-        {
-            Name = "F Major/D Minor",
-            Notes = new List<Note>()
-            {
-                Note.F,
-                Note.G,
-                Note.A,
-                Note.As,
-                Note.Bf,
-                Note.C,
-                Note.D,
-                Note.E
-            }
-        });
-
-        return keys;
     }
 
     private static List<List<Note>> GroupNotes()
@@ -347,10 +83,5 @@
         }
 
         return groupedNotes;
-    }
-
-    private bool NotesEqual(Note note1, Note note2)
-    {
-        return (int)note1 / 10 == (int)note2 / 10;
     }
 }

@@ -1,0 +1,66 @@
+﻿@foreach (var key in Keys)
+{
+    int rows = 1;
+    <div>
+        <label>@key.Name</label>
+        @for (var i = 0; i < key.Notes.Count; i++)
+        {
+            @if (i > 0 && NotesEqual(key.Notes[i - 1], key.Notes[i]))
+            {
+                <text>/</text>
+            }
+            else
+            {
+                <br />
+                <label>@(RomanNumeralize(rows++, key.Tone)):</label>
+            }
+            @key.Notes[i].ToString().Replace('s', '\u266F').Replace('f', '\u266D')
+        }
+    </div>
+    <br />
+}
+
+@code {
+
+    [Parameter]
+    public List<Key> Keys { get; set; }
+    private static Dictionary<Tone,List<int>> Majors = new Dictionary<Tone, List<int>> {
+        { Tone.Major, new List<int> { 1, 4, 5 } },
+        { Tone.Minor, new List<int> { 3, 6, 7 } }
+    };
+    private static Dictionary<Tone, int> Dims = new Dictionary<Tone, int> {
+        { Tone.Major, 7 },
+        { Tone.Minor, 2 }
+    };
+
+    private bool NotesEqual(Note note1, Note note2)
+    {
+        return (int)note1 / 10 == (int)note2 / 10;
+    }
+
+    private string RomanNumeralize(int chordNumber, Tone tone)
+    {
+        var romanNumeral = ToRoman(chordNumber);
+
+        if (!Majors[tone].Contains(chordNumber))
+        {
+            romanNumeral = romanNumeral.ToLower();
+        }
+
+        if (chordNumber == Dims[tone])
+        {
+            romanNumeral += "(dim)";
+        }
+
+        return romanNumeral;
+    }
+
+    private static string ToRoman(int number)
+    {
+        if (number < 1) return string.Empty;
+        if (number >= 5) return "V" + ToRoman(number - 5);
+        if (number >= 4) return "IV" + ToRoman(number - 4);
+        if (number >= 1) return "I" + ToRoman(number - 1);
+        throw new ArgumentOutOfRangeException("something bad happened");
+    }
+}

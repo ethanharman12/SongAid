@@ -1,0 +1,91 @@
+﻿@page "/capo"
+
+<style>
+    .selected {
+        background-color: powderblue;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 2px;
+    }
+
+    .buttonCell {
+        width: 40px;
+        display: inline-block;
+        padding: 3px;
+    }
+</style>
+
+<h3>Capo</h3>
+
+<div class="row">
+    <div class="col-md-6">
+
+        Capo Fret:
+        <select @onchange="ChangeCapo">
+            @for (int i = 1; i < 11; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Shape</th>
+                    <th>Note w/ Capo Fret @CapoFret</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var note in Capoless)
+                {
+                    <tr>
+                        <td>@note</td>
+                        <td>@String.Join("/", note.AddStep(CapoFret * 10)).Replace('s', '\u266F').Replace('f', '\u266D')</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        Selected Key:
+        <select @onchange="ChangeKey">
+            @foreach (var key in TotalKeys)
+            {
+                <option value="@key.Name">@key.Name</option>
+            }
+        </select>
+        @if (SelectedKeys != null)
+        {
+            <KeyDisplay Keys="SelectedKeys"></KeyDisplay>
+        }
+    </div>
+</div>
+
+@code {
+        static List<Note> Capoless = new List<Note> { Note.A, Note.B, Note.C, Note.D, Note.E, Note.F, Note.G };
+    private static List<Key> TotalKeys = KeyCalculator.CalculateKeys();
+    List<Key> SelectedKeys;
+    int CapoFret = 1;
+    bool DirectionToggled = false;
+
+    private void ChangeCapo(ChangeEventArgs e)
+    {
+        CapoFret = int.Parse(e.Value.ToString());
+    }
+
+    private void ChangeKey(ChangeEventArgs e) 
+    {
+        SelectedKeys = TotalKeys.Where(k => k.Name == e.Value.ToString()).ToList();
+    }
+
+    private void Toggle()
+    {
+        DirectionToggled = !DirectionToggled;
+    }
+}
