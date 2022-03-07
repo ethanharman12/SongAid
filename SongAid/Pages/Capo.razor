@@ -19,6 +19,10 @@
         display: inline-block;
         padding: 3px;
     }
+
+    .open-string {
+        background-color: powderblue;
+    }
 </style>
 
 <h3>Capo</h3>
@@ -46,7 +50,7 @@
                 {
                     <tr>
                         <td>@note</td>
-                        <td>@String.Join("/", note.AddStep(CapoFret * 10)).Replace('s', '\u266F').Replace('f', '\u266D')</td>
+                        <td>@note.AddStep(CapoFret * .5).GetName()</td>
                     </tr>
                 }
             </tbody>
@@ -66,20 +70,53 @@
         }
     </div>
 </div>
+<hr />
+<h3>Fret</h3>
+<table>
+    <thead>
+        <tr>
+            <th class="open-string">0</th>
+            @for(int i = 1; i <= 12; i++) 
+            {
+            <th>@i</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var note in StringNotes)
+        {
+        <tr>
+            <td class="open-string">@note</td>
+            @for (int i = 1; i <= 12; i++)
+            {
+                <td @attributes="DetermineFret(i)">@note.AddStep(i * .5).GetName()</td>
+            }
+        </tr>
+        }
+    </tbody>
+</table>
 
 @code {
-        static List<Note> Capoless = new List<Note> { Note.A, Note.B, Note.C, Note.D, Note.E, Note.F, Note.G };
+    static List<Note> Capoless = new List<Note> { Note.A, Note.B, Note.C, Note.D, Note.E, Note.F, Note.G };
+    static List<Note> StringNotes = new List<Note> { Note.E, Note.B, Note.G, Note.D, Note.A, Note.E };
     private static List<Key> TotalKeys = KeyCalculator.CalculateKeys();
     List<Key> SelectedKeys;
     int CapoFret = 1;
     bool DirectionToggled = false;
+
+    Dictionary<string, object> DetermineFret(int i)
+    {
+        var dict = new Dictionary<string, object>();
+        if (i == CapoFret) dict.Add("class", "open-string");
+        return dict;
+    }
 
     private void ChangeCapo(ChangeEventArgs e)
     {
         CapoFret = int.Parse(e.Value.ToString());
     }
 
-    private void ChangeKey(ChangeEventArgs e) 
+    private void ChangeKey(ChangeEventArgs e)
     {
         SelectedKeys = TotalKeys.Where(k => k.Name == e.Value.ToString()).ToList();
     }

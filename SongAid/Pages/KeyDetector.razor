@@ -4,15 +4,18 @@
     .selected {
         background-color: powderblue;
     }
+
     label {
         font-weight: bold;
     }
+
     th, td {
         border: 1px solid black;
         padding: 2px;
     }
+
     .buttonCell {
-        width: 40px;
+        width: 60px;
         display: inline-block;
         padding: 3px;
     }
@@ -20,30 +23,49 @@
 
 <h3>KeyDetector</h3>
 
-@foreach(var group in GroupNotes())
-{
-<div>
-    @if(!group.Any(n => n.ToString().Contains("f"))) {
-        <span class="buttonCell"></span>
-    }
-    @foreach(var note in group)
+@*@foreach(var group in GroupedNotes)
     {
-        <span class="buttonCell"><button @onclick="(e) => Toggle(note)" class="@(SelectedNotes.Contains(note) ? "selected" : "")">@note</button></span>
-    }
-</div>
+    <div>
+        @if(!group.Any(n => n.ToString().Contains("f"))) {
+            <span class="buttonCell"></span>
+        }
+        @foreach(var note in group)
+        {
+            <span class="buttonCell"><button @onclick="(e) => Toggle(note)" class="@(SelectedNotes.Contains(note) ? "selected" : "")">@note</button></span>
+        }
+    </div>
+    }*@
+@foreach (var note in GroupedNotes)
+{
+    <span class="buttonCell"><button @onclick="(e) => Toggle(note)" class="@(SelectedNotes.Contains(note) ? "selected" : "")">@note.GetName()</button></span>
 }
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == Tone.Major).ToList()"></KeyDisplay>
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == KeyTone.Major).ToList()"></KeyDisplay>
     </div>
     <div class="col-md-6">
-        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == Tone.Minor).ToList()"></KeyDisplay>
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == KeyTone.Minor).ToList()"></KeyDisplay>
+    </div>
+    <div class="col-md-6">
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == KeyTone.Lydian).ToList()"></KeyDisplay>
+    </div>
+    <div class="col-md-6">
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == KeyTone.Dorian).ToList()"></KeyDisplay>
+    </div>
+    <div class="col-md-6">
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == KeyTone.Phrygian).ToList()"></KeyDisplay>
+    </div>
+    <div class="col-md-6">
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == KeyTone.HarmonicMinor).ToList()"></KeyDisplay>
+    </div>
+    <div class="col-md-6">
+        <KeyDisplay Keys="SelectedKeys.Where(k => k.Tone == KeyTone.Mixolydian).ToList()"></KeyDisplay>
     </div>
 </div>
 
 @code {
-    private static List<List<Note>> GroupedNotes = GroupNotes();
+    private static List<Note> GroupedNotes = GroupNotes();
     private List<Note> SelectedNotes = new List<Note>();
     private static List<Key> TotalKeys = KeyCalculator.CalculateKeys();
     private List<Key> SelectedKeys = new List<Key>();
@@ -62,26 +84,8 @@
         SelectedKeys = TotalKeys.Where(k => k.Notes.Intersect(SelectedNotes).Count() == SelectedNotes.Count()).ToList();
     }
 
-    private static List<List<Note>> GroupNotes()
+    private static List<Note> GroupNotes()
     {
-        var names = Enum.GetNames(typeof(Note));
-
-        var groupedNames = names.GroupBy(n => n[0]);
-
-        List<List<Note>> groupedNotes = new List<List<Note>>();
-
-        foreach(var group in groupedNames)
-        {
-            var groupList = new List<Note>();
-
-            foreach(var note in group)
-            {
-                groupList.Add((Note)Enum.Parse(typeof(Note), note));
-            }
-
-            groupedNotes.Add(groupList);
-        }
-
-        return groupedNotes;
+        return Enum.GetValues(typeof(Note)).Cast<Note>().ToList();
     }
 }

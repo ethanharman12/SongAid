@@ -4,15 +4,23 @@ namespace SongAid
 {
     public class Key
     {
-        public Tone Tone;
+        public KeyTone Tone;
         public string Name;
         public List<Note> Notes;
         public Note Root;
+        public List<Chord> Chords;
     }
 
-    public enum Tone
+    public enum KeyTone
     {
         Major,
-        Minor
+        Dorian,
+        Phrygian,
+        Lydian,
+        Mixolydian,
+        Minor,
+        Locrian,        
+        
+        HarmonicMinor        
     }
 }
