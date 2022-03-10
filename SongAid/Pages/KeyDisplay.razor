@@ -16,6 +16,12 @@
     <br />
 }*@
 
+<style>
+    .highlighted-note {
+        background-color: lightseagreen;
+    }
+</style>
+
 @foreach (var key in Keys)
 {
     <div>
@@ -25,7 +31,7 @@
                 @for (int i = 0; i < key.Chords.Count; i++)
                 {
                     var chord = key.Chords[i];
-                    <tr>
+                    <tr @onmouseover="() => SelectChord(chord)" @onmouseout="() => SelectChord(null)" @attributes="HighlightSelected(chord)">
                         <td><label>@RomanNumeralize(i + 1, chord.Tone)</label></td>
                         <td>@chord.Root.GetName()</td>
                         <td>(@string.Join("-", chord.Notes.Select(n => n.GetName())))</td>
@@ -41,6 +47,27 @@
 
     [Parameter]
     public List<Key> Keys { get; set; }
+
+    [Parameter]
+    public EventCallback<Chord> OnChordSelected { get; set; }
+
+    private Chord SelectedChord;
+
+    private async Task SelectChord(Chord chord)
+    {
+        SelectedChord = chord;
+        await OnChordSelected.InvokeAsync(chord);
+    }
+
+    Dictionary<string, object> HighlightSelected(Chord chord)
+    {
+        var dict = new Dictionary<string, object>();
+        if (SelectedChord == chord)
+        {
+            dict.Add("class", "highlighted-note");
+        }
+        return dict;
+    }
 
     private string RomanNumeralize(int chordNumber, ChordTone tone)
     {

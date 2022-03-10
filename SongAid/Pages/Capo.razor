@@ -23,6 +23,10 @@
     .open-string {
         background-color: powderblue;
     }
+
+    .highlighted-note {
+        background-color: lightseagreen;
+    }
 </style>
 
 <h3>Capo</h3>
@@ -32,7 +36,7 @@
 
         Capo Fret:
         <select @onchange="ChangeCapo">
-            @for (int i = 1; i < 11; i++)
+            @for (int i = 0; i < 11; i++)
             {
                 <option value="@i">@i</option>
             }
@@ -66,32 +70,36 @@
         </select>
         @if (SelectedKeys != null)
         {
-            <KeyDisplay Keys="SelectedKeys"></KeyDisplay>
+            <KeyDisplay OnChordSelected="SelectChord" Keys="SelectedKeys"></KeyDisplay>
         }
     </div>
 </div>
 <hr />
 <h3>Fret</h3>
+@if (SelectedChord != null)
+{
+    <text>Selected Chord: @SelectedChord.Root.GetName()</text>
+}
 <table>
     <thead>
         <tr>
             <th class="open-string">0</th>
-            @for(int i = 1; i <= 12; i++) 
+            @for (int i = 1; i <= 12; i++)
             {
-            <th>@i</th>
+                <th>@i</th>
             }
         </tr>
     </thead>
     <tbody>
         @foreach (var note in StringNotes)
         {
-        <tr>
-            <td class="open-string">@note</td>
-            @for (int i = 1; i <= 12; i++)
-            {
-                <td @attributes="DetermineFret(i)">@note.AddStep(i * .5).GetName()</td>
-            }
-        </tr>
+            <tr>
+                @*<td class="open-string">@note</td>*@
+                @for (int i = 0; i <= 12; i++)
+                {
+                    <td @attributes="DetermineFret(i, note.AddStep(i * .5))">@note.AddStep(i * .5).GetName()</td>
+                }
+            </tr>
         }
     </tbody>
 </table>
@@ -100,13 +108,19 @@
     static List<Note> Capoless = new List<Note> { Note.A, Note.B, Note.C, Note.D, Note.E, Note.F, Note.G };
     static List<Note> StringNotes = new List<Note> { Note.E, Note.B, Note.G, Note.D, Note.A, Note.E };
     private static List<Key> TotalKeys = KeyCalculator.CalculateKeys();
-    List<Key> SelectedKeys;
-    int CapoFret = 1;
+    List<Key> SelectedKeys = new List<Key> { TotalKeys.First() };
+    Chord SelectedChord;
+    int CapoFret = 0;
     bool DirectionToggled = false;
 
-    Dictionary<string, object> DetermineFret(int i)
+    Dictionary<string, object> DetermineFret(int i, Note note)
     {
         var dict = new Dictionary<string, object>();
+        if (SelectedChord?.Notes.Contains(note) == true && i >= CapoFret)
+        {
+            dict.Add("class", "highlighted-note");
+            return dict;
+        }
         if (i == CapoFret) dict.Add("class", "open-string");
         return dict;
     }
@@ -114,6 +128,11 @@
     private void ChangeCapo(ChangeEventArgs e)
     {
         CapoFret = int.Parse(e.Value.ToString());
+    }
+
+    private void SelectChord(Chord chord)
+    {
+        SelectedChord = chord;
     }
 
     private void ChangeKey(ChangeEventArgs e)
