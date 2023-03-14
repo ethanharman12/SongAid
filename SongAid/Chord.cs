@@ -39,6 +39,26 @@ namespace SongAid
                 Notes.Add(root.AddStep(3.5));
             }            
         }
+
+        public string GetName()
+        {
+            var name = Root.GetName();
+
+            switch (Tone)
+            {
+                case ChordTone.Augmented:
+                    return name + "(aug)";
+                case ChordTone.Diminished:
+                    return name + "(dim)";
+                case ChordTone.Minor:
+                    return name + "m";
+                case ChordTone.Major:
+                default:
+                    return name;
+            }
+            
+            return name;
+        }
     }
 
     public enum ChordTone

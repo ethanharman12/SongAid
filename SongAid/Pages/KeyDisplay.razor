@@ -1,20 +1,22 @@
 ﻿@*@foreach (var key in Keys)
-{
-    <div>
-        <label>@key.Name</label>
-        @for (int i = 0; i < key.Chords.Count; i++)
-        {
-            var chord = key.Chords[i];
-            <br />
-            <label>@RomanNumeralize(i + 1, chord.Tone)</label>
-            @chord.Root.GetName()
-            <span class="chordNotes">
-                (@string.Join("-", chord.Notes.Select(n => n.GetName())))
-            </span>
-        }
-    </div>
-    <br />
-}*@
+    {
+        <div>
+            <label>@key.Name</label>
+            @for (int i = 0; i < key.Chords.Count; i++)
+            {
+                var chord = key.Chords[i];
+                <br />
+                <label>@RomanNumeralize(i + 1, chord.Tone)</label>
+                @chord.Root.GetName()
+                <span class="chordNotes">
+                    (@string.Join("-", chord.Notes.Select(n => n.GetName())))
+                </span>
+            }
+        </div>
+        <br />
+    }*@
+
+@inject IJSRuntime JS
 
 <style>
     .highlighted-note {
@@ -31,13 +33,13 @@
                 @for (int i = 0; i < key.Chords.Count; i++)
                 {
                     var chord = key.Chords[i];
-                    <tr @onmouseover="() => SelectChord(chord)" @onmouseout="() => SelectChord(null)" @attributes="HighlightSelected(chord)">
+                    <tr @onmouseover="() => SelectChord(chord)" @onmouseout="() => SelectChord(null)" @onclick="async () => await PlayChord(chord)" @attributes="HighlightSelected(chord)">
                         <td><label>@RomanNumeralize(i + 1, chord.Tone)</label></td>
-                        <td>@chord.Root.GetName()</td>
+                        <td>@chord.GetName()</td>
                         <td>(@string.Join("-", chord.Notes.Select(n => n.GetName())))</td>
                     </tr>
                 }
-                </tbody>
+            </tbody>
         </table>
     </div>
     <br />
@@ -94,5 +96,16 @@
         if (number >= 4) return "IV" + ToRoman(number - 4);
         if (number >= 1) return "I" + ToRoman(number - 1);
         throw new ArgumentOutOfRangeException("something bad happened");
+    }
+
+    //private async Task PlayChord(Chord chord)
+    //{
+    //    await JS.InvokeVoidAsync("playTone", chord.GetName(), "sine", 2);
+    //}
+
+    private async Task PlayChord(Chord chord)
+    {
+        //await JS.InvokeVoidAsync("playTone", chord.GetName(), "sine", 2);
+        await JS.InvokeVoidAsync("playTone", chord.Notes.Select(note => note.ToString()).ToArray(), "sine", 2);
     }
 }

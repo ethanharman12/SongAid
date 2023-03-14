@@ -1,5 +1,6 @@
 ﻿@page "/capo"
-
+@inject IJSRuntime JS
+    
 <style>
     .selected {
         background-color: powderblue;
@@ -78,7 +79,7 @@
 <h3>Fret</h3>
 @if (SelectedChord != null)
 {
-    <text>Selected Chord: @SelectedChord.Root.GetName()</text>
+    <span @onclick="async () => await PlayChord(SelectedChord)">Selected Chord: @SelectedChord.GetName()</span>
 }
 <table>
     <thead>
@@ -97,7 +98,8 @@
                 @*<td class="open-string">@note</td>*@
                 @for (int i = 0; i <= 12; i++)
                 {
-                    <td @attributes="DetermineFret(i, note.AddStep(i * .5))">@note.AddStep(i * .5).GetName()</td>
+                    var tempI = i;
+                    <td @attributes="DetermineFret(i, note.Item1.AddStep(i * .5))" @onclick="async () => await PlayNote(note.Item2, tempI)">@note.Item1.AddStep(i * .5).GetName()</td>
                 }
             </tr>
         }
@@ -106,7 +108,13 @@
 
 @code {
     static List<Note> Capoless = new List<Note> { Note.A, Note.B, Note.C, Note.D, Note.E, Note.F, Note.G };
-    static List<Note> StringNotes = new List<Note> { Note.E, Note.B, Note.G, Note.D, Note.A, Note.E };
+    static List<Tuple<Note, double>> StringNotes = new List<Tuple<Note, double>> {
+        Tuple.Create<Note, double>(Note.E, 329.63),
+        Tuple.Create<Note, double>(Note.B, 246.94),
+        Tuple.Create<Note, double>(Note.G, 196),
+        Tuple.Create<Note, double>(Note.D, 146.83),
+        Tuple.Create<Note, double>(Note.A, 110),
+        Tuple.Create<Note, double>(Note.E, 82.41)};
     private static List<Key> TotalKeys = KeyCalculator.CalculateKeys();
     List<Key> SelectedKeys = new List<Key> { TotalKeys.First() };
     Chord SelectedChord;
@@ -143,5 +151,18 @@
     private void Toggle()
     {
         DirectionToggled = !DirectionToggled;
+    }
+
+    private async Task PlayNote(double stringFrequency, int step)
+    {
+        var frequency = Math.Pow(1.059463094359, step) * stringFrequency;
+        if(step == 0) { frequency = stringFrequency; }
+        await JS.InvokeVoidAsync("playTone", frequency, "sine", 2);
+    }
+
+    private async Task PlayChord(Chord chord)
+    {
+        //await JS.InvokeVoidAsync("playTone", chord.GetName(), "sine", 2);
+        await JS.InvokeVoidAsync("playTone", chord.Notes.Select(note => note.ToString()).ToArray(), "sine", 2);
     }
 }

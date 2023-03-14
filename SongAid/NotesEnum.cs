@@ -33,5 +33,13 @@ namespace SongAid
             var attributes = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
             return (attributes.Length > 0) ? ((DescriptionAttribute)attributes[0]).Description.Replace('s', '\u266F').Replace('f', '\u266D') : enumVal.ToString();
         }
+
+        public static string GetFrequency(this Enum enumVal)
+        {
+            var type = enumVal.GetType();
+            var memInfo = type.GetMember(enumVal.ToString());
+            var attributes = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return (attributes.Length > 0) ? ((DescriptionAttribute)attributes[0]).Description.Replace('s', '\u266F').Replace('f', '\u266D') : enumVal.ToString();
+        }
     }
 }
